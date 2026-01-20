@@ -8,11 +8,12 @@ import { JwtAuthGuard } from "src/common/guards/jwt-auth.guard";
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
+  service: any;
   constructor(private readonly authService: AuthService) {}
 
   @Post("register")
   register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+    return this.service.register(dto);
   }
 
   @Post("login")
