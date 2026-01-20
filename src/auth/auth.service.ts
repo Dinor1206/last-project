@@ -13,18 +13,22 @@ import { LoginDto } from "./dto/login.dto";
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async register(dto: RegisterDto) {
-    const exists = this.usersService.findByEmail(dto.email);
+    const exists = await this.usersService.findByEmail(dto.email);
     if (exists) {
       throw new BadRequestException("Email already exists");
     }
 
+    if (!dto?.password) {
+      throw new BadRequestException("Password required");
+    }
+
     const hashed = await bcrypt.hash(dto.password, 10);
 
-    const user = this.usersService.create({
+    const user = await this.usersService.create({
       email: dto.email,
       password: hashed,
     });
@@ -36,19 +40,16 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = this.usersService.findByEmail(dto.email);
+    const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException("User not found");
+
+    if (!dto?.password) throw new UnauthorizedException("Password required");
 
     const match = await bcrypt.compare(dto.password, user.password);
     if (!match) throw new UnauthorizedException("Wrong password");
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-    };
+    const payload = { sub: user.id, email: user.email };
 
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
+    return { accessToken: this.jwtService.sign(payload) };
   }
 }
