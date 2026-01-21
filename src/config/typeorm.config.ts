@@ -8,7 +8,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   port: 5000,
   username: "postgres",
   password: "dinor",
-  database: "exam",
+  database: "test",
   autoLoadEntities:true,
   synchronize: true, 
 };
