@@ -11,7 +11,10 @@ export class UsersService {
   ) {}
 
   findByEmail(email: string) {
-    return this.repo.findOne({ where: { email } });
+    return this.repo.findOne({
+      where: { email },
+      select: { id: true, email: true, password: true },
+    });
   }
 
   create(data: Partial<User>) {
